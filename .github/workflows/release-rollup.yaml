@@ -26,7 +26,7 @@ jobs:
           const releaseSummary = [];
           const releaseInfos = [];
           for(const release of releases) {
-            console.log(`Saw release`, release);
+            console.log(`Saw release ${release.tag_name}`);
             if (release.draft) {
               console.log(`Ignoring draft release ${release.tag_name}`);
               continue;
@@ -49,7 +49,7 @@ jobs:
               
             ${releaseInfos.join('\n')}`;
           } else {
-            const {data: pulls} = await octokit.rest.pulls.list({
+            const {data: pulls} = await github.rest.pulls.list({
               owner: 'primer',
               repo: 'view_components',
             });
