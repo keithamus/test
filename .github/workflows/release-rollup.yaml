@@ -37,7 +37,7 @@ jobs:
               continue
             }
             releaseSummary.push(`- Primer ViewComponents [${release.tag_name}](${release.html_url})`);
-            releaseInfos.push(`\n### Shipped in [${release.tag_name}](${release.html_url})\n${release.body}`);
+            releaseInfos.push(`\n### Shipped in [${release.tag_name}](${release.html_url})\n${release.body.replace(/###/g, '####')}`);
           }
           let body = `# ${Intl.DateTimeFormat('en', { month: 'long', year: 'numeric', day: 'numeric'}).format(today) }
             
