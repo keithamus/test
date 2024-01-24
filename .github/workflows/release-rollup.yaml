@@ -36,7 +36,7 @@ jobs:
             }
           }
           let body = `
-          # ${today.getFullMonth()} ${today.getDate()}, ${today.getFullYear()}
+          # ${Intl.DateTimeFormat('en', { month: 'long', year: 'numeric', day: 'numeric'}).format(today) }
 
           ## Primer ViewComponents
 
