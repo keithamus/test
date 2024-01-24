@@ -34,22 +34,20 @@ jobs:
             const published = new Date(release.published_at);
             if (published > today || published < lastWeek) {
               console.log(`Ignoring past release ${release.tag_name}`);
+              continue
             }
             releaseSummary.push(`- Primer ViewComponents [${release.tag_name}](${release.html_url})`);
-            releaseInfos.push(`### Shipped in [${release.tag_name}](${release.html_url})\n${release.body}`);
+            releaseInfos.push(`\n### Shipped in [${release.tag_name}](${release.html_url})\n${release.body}`);
           }
-          let body = `
-            # ${Intl.DateTimeFormat('en', { month: 'long', year: 'numeric', day: 'numeric'}).format(today) }
+          let body = `# ${Intl.DateTimeFormat('en', { month: 'long', year: 'numeric', day: 'numeric'}).format(today) }
             
             ## Primer ViewComponents
           `;
           if (releaseSummary.length) {
-            body += `
-            ### Ships and releases
+            body += `### Ships and releases
             ${releaseSummary.join('\n')}
               
-            ${releaseInfos.join('\n')}
-            `;
+            ${releaseInfos.join('\n')}`;
           } else {
             const {data: pulls} = await octokit.rest.pulls.list({
               owner: 'primer',
@@ -57,9 +55,9 @@ jobs:
             });
             release_pr = pulls.find(pr => pr.title === 'Release Tracking');
             if (release_pr) {
-              body += `No new releases. Follow primer/view_components#${release_pr.id} for updates on the next release.`;
+              body += `\nNo new releases. Follow primer/view_components#${release_pr.id} for updates on the next release.`;
             } else {
-              body += `No new releases. Follow [primer/view_components](https://github.com/primer/view_components) for updates on the next release.`;
+              body += `\nNo new releases. Follow [primer/view_components](https://github.com/primer/view_components) for updates on the next release.`;
             }
           }
           github.rest.issues.createComment({
