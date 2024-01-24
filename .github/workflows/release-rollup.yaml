@@ -55,7 +55,7 @@ jobs:
             });
             release_pr = pulls.find(pr => pr.title === 'Release Tracking');
             if (release_pr) {
-              body += `\nNo new releases. Follow primer/view_components#${release_pr.id} for updates on the next release.`;
+              body += `\nNo new releases. Follow [primer/view_components#${release_pr.number}](${release_pr.html_url}) for updates on the next release.`;
             } else {
               body += `\nNo new releases. Follow [primer/view_components](https://github.com/primer/view_components) for updates on the next release.`;
             }
