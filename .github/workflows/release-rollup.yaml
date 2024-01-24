@@ -15,25 +15,26 @@ jobs:
         retries: 3
         retry-exempt-status-codes: 400,401
         script: >
-          let today = new Date();
-          let lastWeek = new Date(today);
-          lastWeek.setDate(lastWeek.getDate() - 7);
-          console.log(`Checking releases between ${today.toJSON()} and ${lastWeek.toJSON()}`);
+          const github = {}
+          let today = new Date()
+          let lastWeek = new Date(today)
+          lastWeek.setDate(lastWeek.getDate() - 7)
+          console.log(`Checking releases between ${today.toJSON()} and ${lastWeek.toJSON()}`)
           const {data: releases} = await github.rest.repos.listReleases({
             owner: 'primer',
             repo: 'view_components',
-          });
-          const releaseSummary = [];
-          const releaseInfos = [];
+          })
+          const releaseSummary = []
+          const releaseInfos = []
           for(const release of releases) {
-            console.log(`Saw release`, release);
+            console.log(`Saw release`, release)
             if (release.draft) {
-              console.log(`Ignoring draft release ${release.tag_name}`);
+              console.log(`Ignoring draft release ${release.tag_name}`)
               continue;
             }
-            const published = new Date(release.published_at);
+            const published = new Date(release.published_at)
             if (published > today || published < lastWeek) {
-              console.log(`Ignoring past release ${release.tag_name}`);
+              console.log(`Ignoring past release ${release.tag_name}`)
             }
             releaseSummary.push(`- Primer ViewComponents [${release.tag_name}](${release.html_url})`)
             releaseInfos.push(`### Shipped in [${release.tag_name}](${release.html_url})\n${release.body}`)
@@ -49,12 +50,12 @@ jobs:
             ${releaseSummary.join('\n')}
               
             ${releaseInfos.join('\n')}
-            `;
+            `
           } else {
             const {data: pulls} = await octokit.rest.pulls.list({
               owner: 'primer',
               repo: 'view_components',
-            });
+            })
             release_pr = pulls.find(pr => pr.title === 'Release Tracking')
             if (release_pr) {
               body = `No new releases. Follow primer/view_components#${release_pr.id} for updates on the next release.`
