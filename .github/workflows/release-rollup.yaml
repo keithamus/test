@@ -17,7 +17,7 @@ jobs:
         script: |
           let today = new Date();
           let lastWeek = new Date(today);
-          lastWeek.setDay(lastWeek.getDay() - 7);
+          lastWeek.setDate(lastWeek.getDate() - 7);
           console.log(`Checking releases between ${today.toJSON()} and ${lastWeek.toJSON()}`);
           const releases = await github.rest.repos.listReleases({
             owner: 'primer',
