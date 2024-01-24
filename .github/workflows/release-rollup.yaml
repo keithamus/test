@@ -26,7 +26,7 @@ jobs:
           const releasesToAnnounce = []
           const releaseSummary = [];
           const releaseInfos = [];
-          for(const release of releases) {
+          for(const release of releases.data) {
             if (release.draft) continue;
             const published = new Date(release.published_at);
             if (published <= today && published >= lastWeek) {
