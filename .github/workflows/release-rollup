@@ -1,0 +1,53 @@
+name: Add accessibility design issues to project boards
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: 0 6 * * 1
+      
+jobs:
+  release-rollup-pvc:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/github-script@v7
+      id: my-script
+      with:
+        result-encoding: string
+        retries: 3
+        retry-exempt-status-codes: 400,401
+        script: |
+          let today = new Date();
+          let lastWeek = new Date(today);
+          lastWeek.setDay(lastWeek.getDay() - 7);
+          console.log(`Checking releases between ${today.toJSON()} and ${lastWeek.toJSON()}`);
+          const releases = await github.rest.repos.listReleases({
+            owner: 'primer',
+            repo: 'view_components',
+          });
+          const releasesToAnnounce = []
+          const releaseSummary = [];
+          const releaseInfos = [];
+          for(const release of releases) {
+            if (release.draft) continue;
+            const published = new Date(release.published_at);
+            if (published <= today && published >= lastWeek) {
+              releasesToAnnounce.push(release);
+              releaseSummary.push(`- Primer ViewComponents [${release.tag_name}](${release.html_url})`)
+              releaseInfos.push(`### Shipped in [${release.tag_name}](${release.html_url})\n${release.body}`)
+            }
+          }
+          let body = `
+          # ${today.getFullMonth()} ${today.getDate()}, ${today.getFullYear()}
+
+          ## Primer ViewComponents
+
+          ### Ships and releases
+          ${releaseSummary.join('\n')}
+
+          ${releaseInfos.join('\n')}
+          `;
+          github.rest.issues.createComment({
+            issue_number: 2,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body
+          })
