@@ -15,7 +15,6 @@ jobs:
         retries: 3
         retry-exempt-status-codes: 400,401
         script: >
-          const github = {}
           let today = new Date()
           let lastWeek = new Date(today)
           lastWeek.setDate(lastWeek.getDate() - 7)
