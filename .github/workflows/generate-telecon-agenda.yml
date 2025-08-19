@@ -1,0 +1,35 @@
+name: Generate Telecon Agenda
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * 3"
+jobs:
+  build:
+    name: Generate Telecon Agenda
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - name: Generate Telecon Agenda
+        run: |
+          git config user.name "Keith Cirkel"
+          git config user.email "keithamus@users.noreply.github.com"
+          # Ensure that the agenda is set for this day of the week. If we ever change
+          # the day we meet on, this should be changed!
+          DAY="thursday"
+          ISSUES=$(gh issue list --label "agenda+" --json title,number,url)
+          mkdir -p ./meetings/telecon/
+          # Only commit a new agenda file if we have issues with the agenda+ label
+          if [ "$(echo "$ISSUES" | jq -r 'length // 0')" -gt 0 ]; then
+            # Build the markdown document
+            echo "$ISSUES" | jq --arg date "$(date -d $DAY '+%B %d, %Y')" -r 'sort_by(.number) | "# Telecon Agenda, " + $date + "\n===================================\n" + (map("* \(.title) [#\(.number)](\(.url))") | join("\n"))' > "./meetings/telecon/$(date -d $DAY '+%Y-%m-%d').md"
+            # Commit and push
+            git add ./meetings/telecon/
+            git commit --message "Create $(date -d $DAY '+%Y-%m-%d').md"
+            git push
+          fi
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
